@@ -103,7 +103,7 @@ function SignupScreenView({ signupName, signupEmail, signupPassword, setSignupNa
   );
 }
 
-// --- Main App Component ---
+
 
 export default function App() {
   const [screen, setScreen] = useState('splash');
