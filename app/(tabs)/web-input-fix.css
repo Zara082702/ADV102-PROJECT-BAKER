@@ -1,0 +1,30 @@
+input, textarea {
+  background-color: #1e1e1e !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #888 !important;
+  opacity: 1 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1e1e1e inset !important;
+  box-shadow: 0 0 0 1000px #1e1e1e inset !important;
+  -webkit-text-fill-color: white !important;
+}
+
+input:-moz-autofill,
+input:-moz-autofill:hover,
+input:-moz-autofill:focus,
+input:-moz-autofill:active {
+  box-shadow: 0 0 0 1000px #1e1e1e inset !important;
+  -moz-text-fill-color: white !important;
+}
