@@ -74,13 +74,14 @@ function LoginScreenView({ loginEmail, loginPassword, setLoginEmail, setLoginPas
     <ImageBackground source={require('../../assets/images/background2.jpg')} style={styles.backgroundImage} resizeMode="cover">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
         <TouchableOpacity onPress={() => setScreen('splash')} style={{ marginBottom: 20 }}><ArrowLeft color="white" size={24} /></TouchableOpacity>
-        <Text style={[styles.mainTitle, { fontFamily: 'ItalicCoffeeFont' }]}>Hello There! Ready for your caffeine fix?</Text>
+        <Text style={[styles.mainTitle, { fontFamily: 'ItalicCoffeeFont', fontWeight: 'thin' }]}>Hello There! Ready for your caffeine fix?</Text>
         <View style={styles.inputGroup}><Mail color="#D17842" size={20} /><TextInput placeholder="Email Address" placeholderTextColor="#888" style={styles.authInput} value={loginEmail} onChangeText={setLoginEmail} autoCapitalize="none" /></View>
         <View style={styles.inputGroup}><Lock color="#D17842" size={20} /><TextInput placeholder="Password" placeholderTextColor="#888" secureTextEntry style={styles.authInput} value={loginPassword} onChangeText={setLoginPassword} /></View>
         {!!authError && <Text style={{ color: '#ff6666', marginBottom: 10 }}>{authError}</Text>}
         <TouchableOpacity style={styles.getStartedBtn} onPress={onLogin}><Text style={styles.btnText}>Login</Text></TouchableOpacity>
         <TouchableOpacity style={styles.googleBtn} onPress={onGoogleLogin}><Chrome color="white" size={20} /><Text style={[styles.btnText, { marginLeft: 10, fontSize: 16 }]}>Continue with Google</Text></TouchableOpacity>
-        <TouchableOpacity style={{ marginTop: 20, alignItems: 'center' }} onPress={() => setScreen('signup')}><Text style={{ color: '#888' }}>Don't have an account? <Text style={{ color: '#D17842', fontWeight: 'bold' }}>Sign Up</Text></Text></TouchableOpacity>
+        <TouchableOpacity style={{ marginTop: 20, alignItems: 'center' }} onPress={() => setScreen('signup')}><Text style={{ color: '#888' }}>Sign up to Avail our Loyalty Discount!
+        <Text style={{ color: '#D17842', fontWeight: 'bold' }}> Sign Up</Text></Text></TouchableOpacity>
       </KeyboardAvoidingView>
     </ImageBackground>
   );
@@ -91,7 +92,7 @@ function SignupScreenView({ signupName, signupEmail, signupPassword, setSignupNa
     <ImageBackground source={require('../../assets/images/background2.jpg')} style={styles.backgroundImage} resizeMode="cover">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
         <TouchableOpacity onPress={() => setScreen('login')} style={{ marginBottom: 20 }}><ArrowLeft color="white" size={24} /></TouchableOpacity>
-        <Text style={[styles.mainTitle, { fontFamily: 'ItalicCoffeeFont' }]}>Sign up to Avail our Loyalty Discount!</Text>
+        <Text style={[styles.mainTitle, { fontFamily: 'ItalicCoffeeFont' }]}>Register to get your member discount! </Text>
         <View style={styles.inputGroup}><User color="#D17842" size={20} /><TextInput placeholder="Full Name" placeholderTextColor="#888" style={styles.authInput} value={signupName} onChangeText={setSignupName} /></View>
         <View style={styles.inputGroup}><Mail color="#D17842" size={20} /><TextInput placeholder="Email" placeholderTextColor="#888" style={styles.authInput} value={signupEmail} onChangeText={setSignupEmail} keyboardType="email-address" /></View>
         <View style={styles.inputGroup}><Lock color="#D17842" size={20} /><TextInput placeholder="Password" placeholderTextColor="#888" secureTextEntry style={styles.authInput} value={signupPassword} onChangeText={setSignupPassword} /></View>
@@ -101,6 +102,8 @@ function SignupScreenView({ signupName, signupEmail, signupPassword, setSignupNa
     </ImageBackground>
   );
 }
+
+// --- Main App Component ---
 
 export default function App() {
   const [screen, setScreen] = useState('splash');
@@ -177,7 +180,6 @@ export default function App() {
   const completedOrders = purchaseHistory.filter(o => o.status === 'Completed').length;
   const rawTotal = cartItems.reduce((sum, i) => sum + parseInt(i.price.replace('$','')), 0);
   
-  
   let discountPercent = 0;
   if (completedOrders === 4) discountPercent = 0.20; 
   if (completedOrders === 9) discountPercent = 0.50; 
@@ -188,7 +190,6 @@ export default function App() {
     try {
       const userId = auth.currentUser?.uid;
       const transactionId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
-      console.log("Checking data before save:", { userId, transactionId, finalPrice });
       await addDoc(collection(db, "userHistory"), { 
         userId, transactionId, summary: `${cartItems.length} items ordered`, 
         total: finalPrice, 
@@ -235,7 +236,7 @@ export default function App() {
 
       {screen === 'splash' && (
         <ImageBackground source={require('../../assets/images/background.jpeg')} style={styles.backgroundImage} resizeMode="cover">
-          <View style={styles.darkOverlay}><Text style={[styles.logoText, { fontFamily: 'ItalicCoffeeFont' }]}>Espresso Express</Text><View style={{ flex: 1 }} /><Text style={[styles.tagline, { fontFamily: 'CoffeeFont' }]}>Feeling Low? Take a Sip of Coffee</Text><TouchableOpacity style={styles.getStartedBtn} onPress={() => setScreen('login')}><Text style={styles.btnText}>Get Started</Text></TouchableOpacity></View>
+          <View style={styles.darkOverlay}><Text style={[styles.logoText, { fontFamily: 'ItalicCoffeeFont', fontWeight: 'condensed' }]}>Espresso Express</Text><View style={{ flex: 1 }} /><Text style={[styles.tagline, { fontFamily: 'CoffeeFont', fontWeight: 'thin' }]}>Feeling Low? Take a Sip of Coffee</Text><TouchableOpacity style={styles.getStartedBtn} onPress={() => setScreen('login')}><Text style={styles.btnText}>Get Started</Text></TouchableOpacity></View>
         </ImageBackground>
       )}
 
@@ -245,7 +246,7 @@ export default function App() {
       {screen === 'home' && (
         <View style={styles.container}>
           <View style={styles.homeHeader}><Menu color="white" size={24} /><TouchableOpacity onPress={() => setScreen('cart')}><ShoppingCart color="white" size={24} />{cartItems.length > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{cartItems.length}</Text></View>}</TouchableOpacity></View>
-          <Text style={[styles.mainTitle, { fontFamily: 'CoffeeFont' }]}>It's a Great Day for Coffee</Text>
+          <Text style={[styles.mainTitle, { fontFamily: 'CoffeeFont', fontWeight: 'thin' }]}>Brain power, brewed to order.</Text>
           <View style={styles.searchBar}><Search color="#888" size={20} /><TextInput placeholder="Find your coffee" placeholderTextColor="#888" style={styles.searchInput} value={searchQuery} onChangeText={setSearchQuery} /></View>
           <FlatList 
             data={coffeeItems.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))} 
@@ -253,7 +254,11 @@ export default function App() {
             renderItem={({ item }) => (
               <View style={styles.coffeeCard}>
                 <TouchableOpacity onPress={() => addDoc(collection(db, "favorites"), { userId: auth.currentUser?.uid, name: item.name, price: item.price, timestamp: serverTimestamp() }).then(() => triggerToast("Great Choice! Added to Favorites"))} style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}><Heart color="#D17842" size={18} /></TouchableOpacity>
-                <Image source={item.img} style={styles.cardImg} /><Text style={styles.cardName}>{item.name}</Text>
+                
+                <View style={styles.cardImgContainer}>
+                   <Image source={item.img} style={styles.cardImg} resizeMode="contain" />
+                </View>
+                <Text style={styles.cardName}>{item.name}</Text>
                 <View style={styles.cardFooter}><Text style={styles.cardPrice}>{item.price}</Text><TouchableOpacity style={styles.plusBtn} onPress={() => { setSelectedCoffee(item); setIsModalVisible(true); }}><Plus color="white" size={16} /></TouchableOpacity></View>
               </View>
             )} 
@@ -273,7 +278,6 @@ export default function App() {
              <View style={{ marginLeft: 15 }}><Text style={{ color: 'white', fontWeight: 'bold' }}>{userProfile?.fullName || auth.currentUser?.email}</Text><Text style={{ color: '#888' }}>Member</Text></View>
           </View>
 
-          
           <View style={styles.loyaltyCard}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
               <Text style={{ color: 'white', fontWeight: 'bold' }}>Loyalty Card</Text>
@@ -289,8 +293,8 @@ export default function App() {
             <Text style={{ color: '#888', fontSize: 11, marginTop: 10 }}>*Get discounts on your 5th & 10th coffee purchase!</Text>
           </View>
 
-          <Text style={{ color: 'white', fontSize: 18, marginTop: 20, marginBottom: 10, fontWeight: 'bold' }}>Recent Activity</Text>
-          <FlatList data={purchaseHistory} renderItem={({ item }: any) => (
+          <Text style={{ color: 'white', fontSize: 18, marginTop: 20, marginBottom: 10, fontWeight: 'bold' }}>Orders</Text>
+          <FlatList data={purchaseHistory} keyExtractor={(item: any) => item.id} renderItem={({ item }: any) => (
             <View style={styles.cartItemCard}>
               <View style={{ flex: 1 }}><Text style={{ color: 'white', fontWeight: 'bold' }}>{item.transactionId}</Text><Text style={{ color: item.status === 'Cancelled' ? '#ff4444' : '#D17842' }}>{item.status}</Text></View>
               {item.status === 'Pending' && (
@@ -347,25 +351,42 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, paddingTop: 50 },
+  container: { flex: 1, paddingHorizontal: 20, paddingTop: 50, backgroundColor: '#121212' },
   backgroundImage: { flex: 1, width: '100%', height: '100%' },
   darkOverlay: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40, backgroundColor: 'rgba(0,0,0,0.5)' },
   logoText: { color: 'white', fontSize: 50, marginTop: 50, textAlign: 'center' },
   tagline: { color: 'white', fontSize: 18, textAlign: 'center', marginBottom: 10 },
   getStartedBtn: { backgroundColor: '#D17842', paddingVertical: 15, borderRadius: 10, alignItems: 'center', width: '100%', marginTop: 20 },
-  googleBtn: { backgroundColor: '#505968', paddingVertical: 15, borderRadius: 10, alignItems: 'center', width: '100%', marginTop: 10, flexDirection: 'row', justifyContent: 'center' },
+  googleBtn: { backgroundColor: '#626b79', paddingVertical: 15, borderRadius: 10, alignItems: 'center', width: '100%', marginTop: 10, flexDirection: 'row', justifyContent: 'center' },
   btnText: { color: 'white', fontWeight: 'bold', fontSize: 18 },
   homeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   mainTitle: { color: 'white', fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
   searchBar: { backgroundColor: '#1E1E1E', flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, marginBottom: 20 },
   searchInput: { color: 'white', marginLeft: 10, flex: 1 },
   coffeeCard: { backgroundColor: '#1E1E1E', flex: 1, margin: 8, borderRadius: 20, padding: 12 },
-  cardImg: { width: '100%', height: 100, borderRadius: 15, marginBottom: 10 },
+  
+  
+  cardImgContainer: {
+    width: '50%',
+    marginLeft: '25%',
+    aspectRatio: 1, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderRadius: 15,
+    overflow: 'hidden', 
+    backgroundColor: '#000', 
+  },
+  cardImg: { 
+    width: '100%', 
+    height: '100%', 
+  },
+  
   cardName: { color: 'white', fontWeight: 'bold', fontSize: 16 },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, alignItems: 'center' },
   cardPrice: { color: 'white', fontWeight: 'bold' },
   plusBtn: { backgroundColor: '#D17842', padding: 6, borderRadius: 8 },
-  navBar: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 20, borderTopWidth: 1, borderTopColor: '#333' },
+  navBar: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 20, borderTopWidth: 1, borderTopColor: '#333', backgroundColor: '#121212' },
   badge: { position: 'absolute', right: -6, top: -6, backgroundColor: '#D17842', borderRadius: 10, width: 18, height: 18, justifyContent: 'center', alignItems: 'center' },
   badgeText: { color: 'black', fontSize: 10, fontWeight: 'bold' },
   cartItemCard: { flexDirection: 'row', backgroundColor: '#1E1E1E', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center' },
@@ -374,11 +395,11 @@ const styles = StyleSheet.create({
   inputGroup: { backgroundColor: '#1E1E1E', flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 12, marginBottom: 15, width: '100%' },
   authInput: { color: 'white', marginLeft: 10, flex: 1 },
   toastContainer: { position: 'absolute', top: 50, left: 20, right: 20, backgroundColor: '#D17842', padding: 15, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  toastText: { color: 'white', fontWeight: 'bold', marginLeft: 10 },
+  toastText: { color: 'white', fontWeight: 'bold', fontFamily: 'Sans-Serif', marginLeft: 10 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#121212', padding: 25, borderTopLeftRadius: 30, borderTopRightRadius: 30, borderTopWidth: 2, borderTopColor: '#333', maxHeight: '80%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalTitle: { color: 'white', fontSize: 20, fontWeight: 'bold' },
+  modalTitle: { color: 'white', fontSize: 20, fontWeight: 'thin' },
   optionLabel: { color: '#888', marginBottom: 10, marginTop: 10 },
   optionGroup: { flexDirection: 'row', gap: 5, marginBottom: 10, flexWrap: 'wrap' },
   optionBtn: { paddingVertical: 8, paddingHorizontal: 10, borderRadius: 8, borderWidth: 1, borderColor: '#333' },
