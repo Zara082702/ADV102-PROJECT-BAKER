@@ -167,6 +167,10 @@ export default function App() {
     { id: '2', name: 'Espresso', price: '₱28', img: require('../../assets/images/espresso.jpg') },
     { id: '3', name: 'Black Coffee', price: '₱80', img: require('../../assets/images/blackcoffee.jpg') },
     { id: '4', name: 'Iced Coffee', price: '₱24', img: require('../../assets/images/icedcoffee.jpg') },
+    { id: '5', name: 'Spanish Latte', price: '₱50', img: require('../../assets/images/spanishlatte.jpg') },
+    { id: '6', name: 'Iced Mocha', price: '₱67', img: require('../../assets/images/icedmocha.webp') },
+
+
   ];
 
   useEffect(() => {
