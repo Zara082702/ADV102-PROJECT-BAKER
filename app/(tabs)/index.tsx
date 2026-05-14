@@ -21,7 +21,6 @@ import {
 } from 'firebase/firestore';
 import {
   ArrowLeft,
-  Bell,
   Camera,
   CheckCircle,
   Chrome,
@@ -73,14 +72,14 @@ function LoginScreenView({ loginEmail, loginPassword, setLoginEmail, setLoginPas
     <ImageBackground source={require('../../assets/images/background2.jpg')} style={styles.backgroundImage} resizeMode="cover">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
         <TouchableOpacity onPress={() => setScreen('splash')} style={{ marginBottom: 20 }}><ArrowLeft color="white" size={24} /></TouchableOpacity>
-        <Text style={[styles.mainTitle, { fontFamily: 'ItalicCoffeeFont', fontWeight: 'thin' }]}>Welcome</Text>
-        <Text style={[styles.subTitle, { fontFamily: 'CoffeeFont', fontWeight: '100' }]}>Ready for your caffeine fix?</Text>
+        <Text style={[styles.mainTitle, { fontFamily: 'Amarante', fontWeight: 'condensedBold' }]}>Welcome</Text>
+        <Text style={[styles.subTitle, { fontFamily: 'CoffeeFont', fontWeight: '100', color: '#919191' }]}>Ready for your caffeine fix?</Text>
         <View style={styles.inputGroup}><Mail color="#D17842" size={20} /><TextInput placeholder="Email Address" placeholderTextColor="#888" style={styles.authInput} value={loginEmail} onChangeText={setLoginEmail} autoCapitalize="none" /></View>
         <View style={styles.inputGroup}><Lock color="#D17842" size={20} /><TextInput placeholder="Password" placeholderTextColor="#888" secureTextEntry style={styles.authInput} value={loginPassword} onChangeText={setLoginPassword} /></View>
         {!!authError && <Text style={{ color: '#ff6666', marginBottom: 10 }}>{authError}</Text>}
         <TouchableOpacity style={styles.getStartedBtn} onPress={onLogin}><Text style={styles.btnText}>Login</Text></TouchableOpacity>
         <TouchableOpacity style={styles.googleBtn} onPress={onGoogleLogin}><Chrome color="white" size={20} /><Text style={[styles.btnText, { marginLeft: 10, fontSize: 16 }]}>Continue with Google</Text></TouchableOpacity>
-        <TouchableOpacity style={{ marginTop: 20, alignItems: 'center' }} onPress={() => setScreen('signup')}><Text style={{ color: '#888', fontFamily: 'CoffeeFont' }}>Sign up to Avail our Loyalty Discount
+        <TouchableOpacity style={{ marginTop: 20, alignItems: 'center' }} onPress={() => setScreen('signup')}><Text style={{ color: '#888', fontFamily: 'Amarante', fontWeight: 'bold' }}>Sign up to Avail our Loyalty Discount
         <Text style={{ color: '#D17842', fontWeight: 'bold', fontFamily: 'Montserrat' }}> Sign Up</Text></Text></TouchableOpacity>
       </KeyboardAvoidingView>
     </ImageBackground>
@@ -114,6 +113,7 @@ export default function App() {
   const [purchaseHistory, setPurchaseHistory] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState<any>(null);
@@ -130,7 +130,6 @@ export default function App() {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isDashboardVisible, setIsDashboardVisible] = useState(false);
 
-  
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -149,7 +148,6 @@ export default function App() {
     if (!result.canceled && result.assets[0].base64) {
       const base64String = `data:image/jpeg;base64,${result.assets[0].base64}`;
       try {
-        
         const userDocRef = doc(db, "users", auth.currentUser!.uid);
         await updateDoc(userDocRef, {
           profilePic: base64String 
@@ -163,14 +161,12 @@ export default function App() {
   };
 
   const coffeeItems = [
-    { id: '1', name: 'Latte', price: '₱69', img: require('../../assets/images/latte.webp') },
-    { id: '2', name: 'Espresso', price: '₱28', img: require('../../assets/images/espresso.jpg') },
-    { id: '3', name: 'Black Coffee', price: '₱80', img: require('../../assets/images/blackcoffee.jpg') },
-    { id: '4', name: 'Iced Coffee', price: '₱24', img: require('../../assets/images/icedcoffee.jpg') },
-    { id: '5', name: 'Spanish Latte', price: '₱50', img: require('../../assets/images/spanishlatte.jpg') },
-    { id: '6', name: 'Iced Mocha', price: '₱67', img: require('../../assets/images/icedmocha.webp') },
-
-
+    { id: '1', name: 'Latte', prices: { Small: '₱20', Medium: '₱30', Large: '₱40' }, img: require('../../assets/images/latte.webp') },
+    { id: '2', name: 'Espresso', prices: { Small: '₱28', Medium: '₱35', Large: '₱42' }, img: require('../../assets/images/espresso.jpg') },
+    { id: '3', name: 'Black Coffee', prices: { Small: '₱80', Medium: '₱100', Large: '₱120' }, img: require('../../assets/images/blackcoffee.jpg') },
+    { id: '4', name: 'Iced Coffee', prices: { Small: '₱24', Medium: '₱30', Large: '₱36' }, img: require('../../assets/images/icedcoffee.jpg') },
+    { id: '5', name: 'Spanish Latte', prices: { Small: '₱50', Medium: '₱60', Large: '₱70' }, img: require('../../assets/images/spanishlatte.jpg') },
+    { id: '6', name: 'Iced Mocha', prices: { Small: '₱67', Medium: '₱77', Large: '₱87' }, img: require('../../assets/images/icedmocha.webp') },
   ];
 
   useEffect(() => {
@@ -193,7 +189,11 @@ export default function App() {
     const historyUnsub = onSnapshot(qHistory, (snapshot) => setPurchaseHistory(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
     const qFavs = query(collection(db, "favorites"), where("userId", "==", auth.currentUser.uid));
     const favsUnsub = onSnapshot(qFavs, (snapshot) => setFavorites(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-    return () => { userUnsub(); historyUnsub(); favsUnsub(); };
+    const qTrans = query(collection(db, "transactions"), where("userId", "==", auth.currentUser.uid));
+    const transUnsub = onSnapshot(qTrans, (snapshot) => {
+      setTransactions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => { userUnsub(); historyUnsub(); favsUnsub(); transUnsub(); };
   }, [auth.currentUser]);
 
   const triggerToast = (message: string) => {
@@ -214,7 +214,7 @@ export default function App() {
   };
 
   const completedOrders = purchaseHistory.filter(o => o.status === 'Completed').length;
-  const rawTotal = cartItems.reduce((sum, i) => sum + parseInt(i.price.replace('$','')), 0);
+  const rawTotal = cartItems.reduce((sum, i) => sum + parseInt(i.price.replace(/[^0-9]/g, '')), 0);
   let discountPercent = 0;
   if (completedOrders === 4) discountPercent = 0.20; 
   if (completedOrders === 9) discountPercent = 0.50; 
@@ -225,16 +225,34 @@ export default function App() {
     try {
       const userId = auth.currentUser?.uid;
       const transactionId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+      const timestamp = serverTimestamp();
+
       await addDoc(collection(db, "userHistory"), { 
         userId, transactionId, summary: `${cartItems.length} items ordered`, 
         total: finalPrice, 
-        status: "Pending", timestamp: serverTimestamp(),
+        status: "Pending", timestamp,
         customDetails: cartItems[0].customs
       });
+
+      await addDoc(collection(db, "transactions"), {
+        userId,
+        transactionId,
+        items: cartItems.map(item => ({
+          name: item.name,
+          price: item.price,
+          customs: item.customs
+        })),
+        totalAmount: finalPrice,
+        status: "Success",
+        timestamp
+      });
+
       setCartItems([]);
       triggerToast(discountPercent > 0 ? "Discount Applied! Order Placed" : "Order Placed Successfully!");
       setScreen('profile');
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error("Transaction Error: ", e);
+    }
   };
 
   if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#000', justifyContent: 'center' }}><ActivityIndicator size="large" color="#D17842" /></View>;
@@ -243,7 +261,6 @@ export default function App() {
     <View style={styles.navBar}>
       <TouchableOpacity onPress={() => setScreen('home')}><Home color={screen === 'home' ? "#D17842" : "#555"} size={24} /></TouchableOpacity>
       <TouchableOpacity onPress={() => setScreen('favorites')}><Heart color={screen === 'favorites' ? "#D17842" : "#555"} size={24} /></TouchableOpacity>
-      <TouchableOpacity onPress={() => setScreen('notifications')}><Bell color={screen === 'notifications' ? "#D17842" : "#555"} size={24} /></TouchableOpacity>
       <TouchableOpacity onPress={() => setScreen('profile')}><User color={screen === 'profile' ? "#D17842" : "#555"} size={24} /></TouchableOpacity>
     </View>
   );
@@ -255,7 +272,6 @@ export default function App() {
           <TouchableOpacity onPress={() => setIsDrawerVisible(false)} style={{ marginBottom: 40 }}>
             <X color="white" size={28} />
           </TouchableOpacity>
-          
           <TouchableOpacity 
             style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 30, backgroundColor: 'rgba(209, 120, 66, 0.1)', padding: 15, borderRadius: 12 }}
             onPress={() => { setIsDrawerVisible(false); setIsDashboardVisible(true); }}
@@ -263,10 +279,6 @@ export default function App() {
             <User color="#D17842" size={24} />
             <Text style={{ color: 'white', fontSize: 18, marginLeft: 15, fontWeight: 'bold' }}>Profile</Text>
           </TouchableOpacity>
-
-          
-  
-
           <View style={{ flex: 1 }} />
           <TouchableOpacity onPress={() => {signOut(auth); setScreen('login'); setIsDrawerVisible(false);}} style={{ flexDirection: 'row', alignItems: 'center', padding: 15 }}>
             <LogOut color="#ff4444" size={20} />
@@ -289,11 +301,8 @@ export default function App() {
             <Text style={[styles.modalTitle, { fontWeight: 'bold', fontFamily: 'Monsterrat' }]}>Dashboard</Text>
             <TouchableOpacity onPress={() => setIsDashboardVisible(false)}><X color="white" size={24} /></TouchableOpacity>
           </View>
-          
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={{ backgroundColor: '#121212', borderRadius: 20, padding: 20, alignItems: 'center', marginBottom: 20 }}>
-              
-              
               <TouchableOpacity onPress={handlePickImage} style={{ marginBottom: 15 }}>
                 <View style={{ width: 100, height: 100, borderRadius: 50, borderStyle: 'dashed', borderWidth: 2, borderColor: '#D17842', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                     {userProfile?.profilePic ? (
@@ -303,14 +312,11 @@ export default function App() {
                     )}
                 </View>
               </TouchableOpacity>
-
-              
               <View style={{ width: '100%', marginTop: 20, gap: 10 }}>
                  <TextInput style={{ color: 'white', borderBottomWidth: 1, borderColor: '#333', paddingVertical: 8 }} value={userProfile?.fullName} editable={false} />
                  <TextInput style={{ color: 'white', borderBottomWidth: 1, borderColor: '#333', paddingVertical: 8 }} value={userProfile?.email} editable={false} />
               </View>
             </View>
-
             <View style={{ backgroundColor: '#121212', borderRadius: 15, padding: 15, marginBottom: 15 }}>
                <Text style={{ color: 'white', fontWeight: 'bold', fontFamily: 'Monsterrat', marginBottom: 10 }}>My Account</Text>
                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -323,7 +329,6 @@ export default function App() {
                   </TouchableOpacity>
                </View>
             </View>
-
             <TouchableOpacity style={[styles.getStartedBtn, { marginTop: 25 }]} onPress={() => setIsDashboardVisible(false)}>
               <Text style={styles.btnText}>Save</Text>
             </TouchableOpacity>
@@ -337,9 +342,7 @@ export default function App() {
     <View style={{ flex: 1, backgroundColor: '#121212' }}>
       <SideDrawer />
       <ProfileDashboard />
-      
       {toastVisible && <View style={styles.toastContainer}><CheckCircle color="white" size={20} /><Text style={styles.toastText}>{toastMessage}</Text></View>}
-      
       <Modal visible={isModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <ScrollView style={styles.modalContent}>
@@ -352,14 +355,24 @@ export default function App() {
             <View style={styles.optionGroup}>{['None', 'Full Cream', 'Oat Milk'].map((m: any) => (<TouchableOpacity key={m} onPress={() => setCustomization({...customization, milk: m})} style={[styles.optionBtn, customization.milk === m && styles.optionBtnActive]}><Text style={[styles.optionBtnText, customization.milk === m && styles.optionBtnTextActive]}>{m}</Text></TouchableOpacity>))}</View>
             <Text style={styles.optionLabel}>Ice</Text>
             <View style={styles.optionGroup}>{['No Ice', 'Less Ice', 'Normal', 'Extra Ice'].map((i: any) => (<TouchableOpacity key={i} onPress={() => setCustomization({...customization, ice: i})} style={[styles.optionBtn, customization.ice === i && styles.optionBtnActive]}><Text style={[styles.optionBtnText, customization.ice === i && styles.optionBtnTextActive]}>{i}</Text></TouchableOpacity>))}</View>
-            <TouchableOpacity style={[styles.getStartedBtn, {width: '100%', marginTop: 20}]} onPress={() => {setCartItems([...cartItems, {...selectedCoffee, cartId: Math.random(), customs: customization}]); setIsModalVisible(false); triggerToast("Great Choice! Added to Cart");}}><Text style={styles.btnText}>Add to Cart</Text></TouchableOpacity>
+            <TouchableOpacity 
+                style={[styles.getStartedBtn, {width: '100%', marginTop: 20}]} 
+                onPress={() => {
+                    const priceForSize = selectedCoffee.prices[customization.size];
+                    setCartItems([...cartItems, {...selectedCoffee, price: priceForSize, cartId: Math.random(), customs: customization}]); 
+                    setIsModalVisible(false); 
+                    triggerToast("Great Choice! Added to Cart");
+                }}
+            >
+                <Text style={styles.btnText}>Add to Cart</Text>
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </Modal>
 
       {screen === 'splash' && (
         <ImageBackground source={require('../../assets/images/background.jpeg')} style={styles.backgroundImage} resizeMode="cover">
-          <View style={styles.darkOverlay}><Text style={[styles.logoText, { fontFamily: 'ItalicCoffeeFont', fontWeight: 'condensed' }]}>Espresso Express</Text><View style={{ flex: 1 }} /><Text style={[styles.tagline, { fontFamily: 'CoffeeFont', fontWeight: 'thin' }]}>Feeling Low? Take a Sip of Coffee</Text><TouchableOpacity style={styles.getStartedBtn} onPress={() => setScreen('login')}><Text style={styles.btnText}>Get Started</Text></TouchableOpacity></View>
+          <View style={styles.darkOverlay}><Text style={[styles.logoText, { fontFamily: 'Amarante', fontWeight: 'condensedBold' }]}>Espresso Express</Text><View style={{ flex: 1 }} /><Text style={[styles.tagline, { fontFamily: 'CoffeeFont', fontWeight: 'thin' }]}>Feeling Low? Take a Sip of Coffee</Text><TouchableOpacity style={styles.getStartedBtn} onPress={() => setScreen('login')}><Text style={styles.btnText}>Get Started</Text></TouchableOpacity></View>
         </ImageBackground>
       )}
 
@@ -375,20 +388,19 @@ export default function App() {
               {cartItems.length > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{cartItems.length}</Text></View>}
             </TouchableOpacity>
           </View>
-          <Text style={[styles.mainTitle, { fontFamily: 'ItalicMonsterrat', fontWeight: '100' }]}>Brain power, brewed to order.</Text>
+          <Text style={[styles.mainTitle, { fontFamily: 'Monsterrat', fontWeight: '100' }]}>Brain power, brewed to order.</Text>
           <View style={styles.searchBar}><Search color="#888" size={20} /><TextInput placeholder="Find your coffee" placeholderTextColor="#888" style={styles.searchInput} value={searchQuery} onChangeText={setSearchQuery} /></View>
           <FlatList 
             data={coffeeItems.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))} 
             numColumns={2} 
             renderItem={({ item }) => (
               <View style={styles.coffeeCard}>
-                <TouchableOpacity onPress={() => addDoc(collection(db, "favorites"), { userId: auth.currentUser?.uid, name: item.name, price: item.price, timestamp: serverTimestamp() }).then(() => triggerToast("Great Choice! Added to Favorites"))} style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}><Heart color="#D17842" size={18} /></TouchableOpacity>
-                
+                <TouchableOpacity onPress={() => addDoc(collection(db, "favorites"), { userId: auth.currentUser?.uid, name: item.name, price: item.prices.Small, timestamp: serverTimestamp() }).then(() => triggerToast("Great Choice! Added to Favorites"))} style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}><Heart color="#D17842" size={18} /></TouchableOpacity>
                 <View style={styles.cardImgContainer}>
                     <Image source={item.img} style={styles.cardImg} resizeMode="contain" />
                 </View>
                 <Text style={styles.cardName}>{item.name}</Text>
-                <View style={styles.cardFooter}><Text style={styles.cardPrice}>{item.price}</Text><TouchableOpacity style={styles.plusBtn} onPress={() => { setSelectedCoffee(item); setIsModalVisible(true); }}><Plus color="white" size={16} /></TouchableOpacity></View>
+                <View style={styles.cardFooter}><Text style={styles.cardPrice}>Starts at {item.prices.Small}</Text><TouchableOpacity style={styles.plusBtn} onPress={() => { setSelectedCoffee(item); setIsModalVisible(true); }}><Plus color="white" size={16} /></TouchableOpacity></View>
               </View>
             )} 
           />
@@ -406,7 +418,6 @@ export default function App() {
               </TouchableOpacity>
               <View style={{ marginLeft: 15 }}><Text style={{ color: 'white', fontWeight: 'bold' }}>{userProfile?.fullName || auth.currentUser?.email}</Text><Text style={{ color: '#888' }}>Member</Text></View>
           </View>
-
           <View style={styles.loyaltyCard}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
               <Text style={{ color: 'white', fontFamily: 'Monsterrat' }}>Loyalty Card</Text>
@@ -421,7 +432,6 @@ export default function App() {
             </View>
             <Text style={{ color: '#888', fontSize: 11, marginTop: 10 }}>*Get discounts on your 5th & 10th coffee purchase!</Text>
           </View>
-
           <Text style={{ color: 'white', fontSize: 18, marginTop: 20, marginBottom: 10, fontWeight: 'bold', fontFamily: 'Monsterrat' }}>Orders</Text>
           <FlatList data={purchaseHistory} keyExtractor={(item: any) => item.id} renderItem={({ item }: any) => (
             <View style={styles.cartItemCard}>
@@ -453,23 +463,24 @@ export default function App() {
             <View style={styles.cartItemCard}>
               <Image source={item.img} style={styles.cartItemImg} />
               <View style={{ flex: 1, marginLeft: 15 }}><Text style={{ color: 'white' }}>{item.name}</Text><Text style={{ color: '#D17842', fontSize: 11 }}>{item.customs.size} | {item.customs.sugar} Sugar</Text></View>
+              <Text style={{ color: 'white', marginRight: 15 }}>{item.price}</Text>
               <TouchableOpacity onPress={() => setCartItems(cartItems.filter(i => i.cartId !== item.cartId))}><Trash2 color="#ff4444" size={20} /></TouchableOpacity>
             </View>
           )} />
           <View style={styles.totalSection}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
               <Text style={{ color: '#888' }}>Subtotal</Text>
-              <Text style={{ color: 'white' }}>${rawTotal}</Text>
+              <Text style={{ color: 'white' }}>₱{rawTotal}</Text>
             </View>
             {discountPercent > 0 && (
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
                 <Text style={{ color: '#D17842' }}>Loyalty Discount ({discountPercent * 100}%)</Text>
-                <Text style={{ color: '#D17842' }}>-${rawTotal * discountPercent}</Text>
+                <Text style={{ color: '#D17842' }}>-₱{rawTotal * discountPercent}</Text>
               </View>
             )}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
               <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Total</Text>
-              <Text style={{ color: '#D17842', fontSize: 18, fontWeight: 'bold' }}>${finalPrice}</Text>
+              <Text style={{ color: '#D17842', fontSize: 18, fontWeight: 'bold' }}>₱{finalPrice}</Text>
             </View>
             <TouchableOpacity style={styles.getStartedBtn} onPress={handleCheckout}><Text style={styles.btnText}>Checkout</Text></TouchableOpacity>
           </View>
