@@ -91,7 +91,7 @@ function SignupScreenView({ signupName, signupEmail, signupPassword, setSignupNa
     <ImageBackground source={require('../../assets/images/background2.jpg')} style={styles.backgroundImage} resizeMode="cover">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
         <TouchableOpacity onPress={() => setScreen('login')} style={{ marginBottom: 20 }}><ArrowLeft color="white" size={24} /></TouchableOpacity>
-        <Text style={[styles.mainTitle, { fontFamily: 'ItalicCoffeeFont', fontWeight: '100' }]}>Register to get your member discount </Text>
+        <Text style={[styles.mainTitle, { fontFamily: 'Amarante', fontWeight: '100' }]}>Register to get your member discount </Text>
         <View style={styles.inputGroup}><User color="#D17842" size={20} /><TextInput placeholder="Full Name" placeholderTextColor="#888" style={styles.authInput} value={signupName} onChangeText={setSignupName} /></View>
         <View style={styles.inputGroup}><Mail color="#D17842" size={20} /><TextInput placeholder="Email" placeholderTextColor="#888" style={styles.authInput} value={signupEmail} onChangeText={setSignupEmail} keyboardType="email-address" /></View>
         <View style={styles.inputGroup}><Lock color="#D17842" size={20} /><TextInput placeholder="Password" placeholderTextColor="#888" secureTextEntry style={styles.authInput} value={signupPassword} onChangeText={setSignupPassword} /></View>
@@ -372,7 +372,7 @@ export default function App() {
 
       {screen === 'splash' && (
         <ImageBackground source={require('../../assets/images/background.jpeg')} style={styles.backgroundImage} resizeMode="cover">
-          <View style={styles.darkOverlay}><Text style={[styles.logoText, { fontFamily: 'Amarante', fontWeight: 'condensedBold' }]}>Espresso Express</Text><View style={{ flex: 1 }} /><Text style={[styles.tagline, { fontFamily: 'CoffeeFont', fontWeight: 'thin' }]}>Feeling Low? Take a Sip of Coffee</Text><TouchableOpacity style={styles.getStartedBtn} onPress={() => setScreen('login')}><Text style={styles.btnText}>Get Started</Text></TouchableOpacity></View>
+          <View style={styles.darkOverlay}><Text style={[styles.logoText, { fontFamily: 'Amarante', fontWeight: 'condensedBold' }]}>Espresso Express</Text><View style={{ flex: 1 }} /><Text style={[styles.tagline, { fontFamily: 'CoffeeFont', fontWeight: 'thin', color: '#919191' }]}>Feeling Low? Take a Sip of Coffee</Text><TouchableOpacity style={styles.getStartedBtn} onPress={() => setScreen('login')}><Text style={styles.btnText}>Get Started</Text></TouchableOpacity></View>
         </ImageBackground>
       )}
 
